@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productos Naturales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f8f5;
+    }
+
+    header {
+      background-color: #2e7d32;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    .product {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product h3 {
+      margin: 0.5rem 0;
+    }
+
+    .product p {
+      color: #555;
+    }
+
+    .whatsapp-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25d366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #adminPanel {
+      display: none;
+      max-width: 600px;
+      margin: 2rem auto;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    #adminPanel input, #adminPanel textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e53935;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Productos Naturales</h1>
+    <p>Salud y bienestar directamente de la naturaleza</p>
+  </header>
+
+  <div id="loginPanel" style="max-width: 400px; margin: 2rem auto; text-align:center;">
+    <input type="password" id="clave" placeholder="Ingresá tu clave de administrador">
+    <button onclick="verificarClave()">Ingresar</button>
+  </div>
+
+  <div id="adminPanel">
+    <h2>Panel de Administración</h2>
+    <input type="text" id="nombre" placeholder="Nombre del producto">
+    <input type="text" id="precio" placeholder="Precio">
+    <input type="text" id="imagen" placeholder="URL de imagen">
+    <textarea id="descripcion" placeholder="Descripción"></textarea>
+    <button onclick="agregarProducto()">Agregar producto</button>
+  </div>
+
+  <main class="container" id="productContainer"></main>
+
+  <a class="whatsapp-button" href="https://wa.me/549XXXXXXXXXX" target="_blank" title="Contactanos por WhatsApp">
+    ☎
+  </a>
+
+  <script>
+    const CLAVE_ADMIN = "1234"; // Cambiá esta clave como desees
+    let productos = JSON.parse(localStorage.getItem('productos')) || [];
+
+    function verificarClave() {
+      const input = document.getElementById("clave").value;
+      if (input === CLAVE_ADMIN) {
+        document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("loginPanel").style.display = "none";
+      } else {
+        alert("Clave incorrecta");
+      }
+    }
+
+    function renderizarProductos() {
+      const contenedor = document.getElementById('productContainer');
+      contenedor.innerHTML = '';
+      productos.forEach((prod, i) => {
+        const card = document.createElement('div');
+        card.className = 'product';
+        card.innerHTML = `
+          <img src="${prod.imagen}" alt="${prod.nombre}">
+          <h3>${prod.nombre}</h3>
+          <p>${prod.descripcion}</p>
+          <strong>${prod.precio}</strong>
+          <button class="delete-btn" onclick="eliminarProducto(${i})">Eliminar</button>
+        `;
+        contenedor.appendChild(card);
+      });
+    }
+
+    function agregarProducto() {
+      const nombre = document.getElementById('nombre').value;
+      const precio = document.getElementById('precio').value;
+      const imagen = document.getElementById('imagen').value;
+      const descripcion = document.getElementById('descripcion').value;
+
+      if (nombre && precio && imagen && descripcion) {
+        productos.push({ nombre, precio, imagen, descripcion });
+        localStorage.setItem('productos', JSON.stringify(productos));
+        renderizarProductos();
+
+        document.getElementById('nombre').value = '';
+        document.getElementById('precio').value = '';
+        document.getElementById('imagen').value = '';
+        document.getElementById('descripcion').value = '';
+      }
+    }
+
+    function eliminarProducto(index) {
+      if (confirm('¿Seguro que querés eliminar este producto?')) {
+        productos.splice(index, 1);
+        localStorage.setItem('productos', JSON.stringify(productos));
+        renderizarProductos();
+      }
+    }
+
+    renderizarProductos();
+  </script>
+</body>
+</html>
